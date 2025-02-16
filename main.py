@@ -15,9 +15,14 @@ class MyFrame(wx.Frame):
         
         width,height = super().GetSize()
     
-        # 让 (0,0) 对应到窗口中心
+        # 全局变量
+        ## 让 (0,0) 对应到窗口中心
         self.offset_sx = width / 4
         self.offset_sy = height / 4
+        self.center_force=0.5
+        self.attraction_force=0.01
+        self.repulsion_force=200.0
+        self.rest_length=100
         
         self.is_dragging=False
         self.last_mouse_x=0
@@ -76,6 +81,10 @@ class MyFrame(wx.Frame):
         if self.opr_num1.IsChecked():
             pos = event.GetPosition()
             self.circles.append(Circle(pos.x-self.offset_sx,pos.y-self.offset_sy))
+            self.last_selected=self.circles[-1]
+            self.last_selected.selected=True
+            self.clicked_circle=[]
+            self.clicked_circle.append(self.last_selected)
         elif self.opr_num2.IsChecked():
             pos = event.GetPosition()
             pos = (pos.x / self.scale, pos.y / self.scale)  # 考虑缩放
@@ -223,7 +232,7 @@ class MyFrame(wx.Frame):
 
     def on_update(self, event):
         for circle in self.circles:
-            circle.update(self.circles,self.offset_sx,self.offset_sy)
+            circle.update(self.circles,self.offset_sx,self.offset_sy,self.center_force,self.attraction_force,self.repulsion_force,self.rest_length)
         self.panel.Refresh() # 会产生事件EVT_PAINT
         
         if self.clicked_circle and self.manager==None:
